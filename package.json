@@ -1,0 +1,32 @@
+{
+  "bugs": {
+    "url": "https://github.com/bosuweru/sakura-bot/issues",
+    "email": "116328571+bosuweru@users.noreply.github.com"
+  },
+  "main": "src/index.js",
+  "name": "@bosuweru/sakura-bot",
+  "author": {
+    "url": "https://github.com/bosuweru",
+    "name": "bosuweru",
+    "email": "116328571+bosuweru@users.noreply.github.com"
+  },
+  "license": "AGPL-3.0",
+  "private": true,
+  "scripts": {
+    "start": "node ."
+  },
+  "version": "1.0.0",
+  "homepage": "https://github.com/bosuweru/sakura-bot#readme",
+  "keywords": [],
+  "repository": {
+    "url": "git+https://github.com/bosuweru/sakura-bot.git",
+    "type": "git"
+  },
+  "description": "",
+  "dependencies": {
+    "discord.js": "^14.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.27.0"
+  }
+}
