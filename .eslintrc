@@ -1,0 +1,25 @@
+{
+    "env": {
+        "node": true,
+        "browser": false
+    },
+    "rules": {
+        "yoda": ["error"],
+        "no-var": ["error"],
+        "no-shadow": ["error"],
+        "no-console": ["off"],
+        "no-lonely-if": ["error"],
+        "prefer-const": ["error"],
+        "no-empty-function": ["error"],
+        "no-inline-comments": ["error"],
+		"max-nested-callbacks": ["error"],
+		"max-statements-per-line": ["error"]
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2021
+    }
+}

@@ -9,9 +9,9 @@ const object = dotenv.config({
   path: path.join(__dirname, "..", "..", "private", ".env"),
   debug: false,
   encoding: "utf8",
-  override: false
+  override: false,
 });
 
 const result = plugin.expand(object);
 
-module.exports = { result }
+module.exports = { result };
