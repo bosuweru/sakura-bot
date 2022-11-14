@@ -10,6 +10,10 @@
     "name": "bosuweru",
     "email": "116328571+bosuweru@users.noreply.github.com"
   },
+  "engines": {
+    "npm": ">=8.19.2",
+    "node": ">=18.12.1"
+  },
   "license": "AGPL-3.0",
   "private": true,
   "scripts": {
@@ -26,7 +30,8 @@
   "dependencies": {
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
-    "dotenv-expand": "^9.0.0"
+    "dotenv-expand": "^9.0.0",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "eslint": "^8.27.0",
