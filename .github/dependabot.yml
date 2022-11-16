@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      timezone: "Etc/UTC"
+      interval: "weekly"
+      time: "17:00"
+      day: "friday"
+    labels: [ ]
