@@ -3,6 +3,7 @@
 const path = require("node:path");
 
 const { result } = require("./utils/dotenv");
+const { logger } = require("./utils/winston");
 const { ShardingManager } = require("discord.js");
 
 const client = path.join(__dirname, "client", "client.js");
@@ -11,7 +12,7 @@ const manager = new ShardingManager(client, {
 });
 
 manager.on("shardCreate", (shard) => {
-  console.log(`Launched Shard ${shard.id}!`);
+  logger.info(`Launched Shard ${shard.id}!`);
 });
 
 manager.spawn();
