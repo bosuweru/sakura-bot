@@ -10,16 +10,12 @@
     "name": "bosuweru",
     "email": "116328571+bosuweru@users.noreply.github.com"
   },
-  "engines": {
-    "npm": ">=8.19.2",
-    "node": ">=18.12.1"
-  },
   "license": "AGPL-3.0",
   "private": true,
   "scripts": {
     "start": "node ."
   },
-  "version": "0.1.0",
+  "version": "1.0.0",
   "homepage": "https://github.com/bosuweru/sakura-bot#readme",
   "keywords": [],
   "repository": {
@@ -28,15 +24,9 @@
   },
   "description": "",
   "dependencies": {
-    "discord.js": "^14.6.0",
-    "dotenv": "^16.0.3",
-    "dotenv-expand": "^9.0.0",
-    "winston": "^3.8.2"
+    "discord.js": "^14.6.0"
   },
   "devDependencies": {
-    "eslint": "^8.27.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1"
+    "eslint": "^8.27.0"
   }
 }
