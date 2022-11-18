@@ -1,24 +1,29 @@
+/**
+ * @file Initializes the 'interactionCreate' event.
+ * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
+ * @license AGPL-3.0
+ * @version 0.1.0
+ */
+
 "use strict";
 
+const { Log } = require("../utils/winston");
+const log = new Log();
+
 const { Events } = require("discord.js");
-const { logger } = require("../utils/winston");
 
 module.exports = {
   name: Events.InteractionCreate,
+  once: false,
   async execute(interaction) {
     if (!interaction.isChatInputCommand()) return;
 
     const command = interaction.client.commands.get(interaction.commandName);
 
-    if (!command) {
-      logger.warn(`No command matching ${interaction.commandName} was found.`);
-      return;
-    }
-
     try {
       await command.execute(interaction);
     } catch (error) {
-      logger.error(`Error executing ${interaction.commandName}`);
+      log.write("error", `Cannot execute interaction.`);
     }
   },
 };
