@@ -25,7 +25,7 @@ const manager = new ShardingManager(client, {
 });
 
 manager.on("shardCreate", (shard) => {
-  logger.write("info", `Created Shard ${shard.id}.`);
+  logger.write("info", `Launched shard ${shard.id}.`);
 });
 
 manager.spawn();
