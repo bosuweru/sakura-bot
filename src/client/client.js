@@ -1,3 +1,10 @@
+/**
+ * @file Initializes the client.
+ * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
+ * @license AGPL-3.0
+ * @version 0.1.0
+ */
+
 "use strict";
 
 const fs = require("node:fs");
@@ -6,7 +13,6 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
 client.commands = new Collection();
 
 const commandsPath = path.join(__dirname, "..", "commands");
