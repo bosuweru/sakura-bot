@@ -19,7 +19,7 @@
   "scripts": {
     "start": "node ."
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/bosuweru/sakura-bot#readme",
   "keywords": [],
   "repository": {
@@ -34,7 +34,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "^8.28.0"
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1"
