@@ -1,17 +1,37 @@
+/**
+ * @file Configures the 'dotenv' utility.
+ * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
+ * @license AGPL-3.0
+ * @version 0.1.0
+ */
+
 "use strict";
 
 const path = require("node:path");
 
-const dotenv = require("dotenv");
-const plugin = require("dotenv-expand");
+const { config } = require("dotenv");
+const { expand } = require("dotenv-expand");
 
-const object = dotenv.config({
-  path: path.join(__dirname, "..", "..", "private", ".env"),
-  debug: false,
-  encoding: "utf8",
-  override: false,
-});
+class Env {
+  constructor() {
+    this.path = path.join(__dirname, "..", "..", "private", ".env");
+    this.debug = false;
+    this.encoding = "utf8";
+    this.override = false;
+  }
 
-const result = plugin.expand(object);
+  config() {
+    return config({
+      path: this.path,
+      debug: this.debug,
+      encoding: this.encoding,
+      override: this.override,
+    });
+  }
 
-module.exports = { result };
+  expand(object) {
+    return expand(object);
+  }
+}
+
+module.exports = { Env };
