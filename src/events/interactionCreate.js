@@ -23,7 +23,7 @@ module.exports = {
     try {
       await command.execute(interaction);
     } catch (error) {
-      log.write("error", `Cannot execute interaction.`);
+      log.write("error", error.name);
     }
   },
 };
