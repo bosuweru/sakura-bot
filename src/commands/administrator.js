@@ -56,8 +56,11 @@ module.exports = {
           ephemeral: true,
         });
       } else {
+        const file = "administrator";
+        const module = require(`./${file}`);
+
         await rest.put(Routes.applicationGuildCommands(client, guild), {
-          body: [],
+          body: [module.data.toJSON()],
         });
 
         await interaction.reply({
