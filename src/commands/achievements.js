@@ -22,19 +22,17 @@ module.exports = {
         .setDescription("Retrieves RetroAchievements game information.")
         .addStringOption((option) =>
           option
+            .setName("console")
+            .setRequired(true)
+            .setDescription("The pre-defined console value.")
+            .setAutocomplete(true)
+        )
+        .addStringOption((option) =>
+          option
             .setName("title")
-            .addChoices(
-              { name: "Battle Heat", value: "13339" },
-              { name: "Chip-chan Kick!", value: "9961" },
-              { name: "Choujin Heiki Zeroigar", value: "9940" },
-              { name: "Farland Story FX", value: "8112" },
-              { name: "Kishin Douji Zenki FX: Vajura Fight", value: "9525" },
-              { name: "Last Imperial Prince", value: "9373" },
-              { name: "Power Dolls FX", value: "16454" },
-              { name: "Shanghai: Banri no Choujou", value: "16458" }
-            )
             .setRequired(true)
             .setDescription("The pre-defined game title value.")
+            .setAutocomplete(true)
         )
     )
     .addSubcommand((subcommand) =>
@@ -42,10 +40,48 @@ module.exports = {
         .setName("user")
         .setDescription("Retrieves RetroAchievements user information.")
     ),
+  async autocomplete(interaction) {
+    const focusedOption = interaction.options.getFocused(true);
+
+    let choices;
+
+    if (focusedOption.name === "console") {
+      choices = ["PC-FX", "Nintendo 64"];
+    }
+
+    if (focusedOption.name === "title") {
+      const console = interaction.options.getString("console");
+
+      if (console === "PC-FX") {
+        choices = ["Battle Heat"];
+      } else if (console === "Nintendo 64") {
+        choices = ["Super Smash Bros."];
+      } else {
+        choices = [];
+      }
+    }
+
+    const filtered = choices.filter((choice) =>
+      choice.startsWith(focusedOption.value)
+    );
+
+    await interaction.respond(
+      filtered.map((choice) => ({ name: choice, value: choice }))
+    );
+  },
   async execute(interaction) {
+    let game;
+
     if (interaction.options.getSubcommand() === "game") {
+      if (interaction.options.getString("title") === "Battle Heat") {
+        game = `game=${13339}`;
+      } else if (
+        interaction.options.getString("title") === "Super Smash Bros."
+      ) {
+        game = `game=${10082}`;
+      }
+
       const key = `key=${RA.API}`;
-      const game = `game=${interaction.options.getString("title")}`;
       const mode = "mode=json";
       const user = `user=${RA.USR}`;
 
