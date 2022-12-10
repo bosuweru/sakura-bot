@@ -31,7 +31,7 @@ module.exports = {
       try {
         await command.autocomplete(interaction);
       } catch (error) {
-        log.write("error", error);
+        console.log(error);
       }
     }
   },
