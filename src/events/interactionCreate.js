@@ -16,14 +16,23 @@ module.exports = {
   name: Events.InteractionCreate,
   once: false,
   async execute(interaction) {
-    if (!interaction.isChatInputCommand()) return;
+    if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
+      return;
 
     const command = interaction.client.commands.get(interaction.commandName);
 
-    try {
-      await command.execute(interaction);
-    } catch (error) {
-      log.write("error", error.name);
+    if (interaction.isChatInputCommand()) {
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        log.write("error", error);
+      }
+    } else if (interaction.isAutocomplete()) {
+      try {
+        await command.autocomplete(interaction);
+      } catch (error) {
+        console.log(error);
+      }
     }
   },
 };
