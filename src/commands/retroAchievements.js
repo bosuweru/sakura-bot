@@ -7,11 +7,12 @@
 
 "use strict";
 
-const { SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 const {
   getGameOptions,
   getConsoleOptions,
+  fetchGameInformation,
 } = require("../helpers/retroAchievements");
 
 module.exports = {
@@ -38,7 +39,44 @@ module.exports = {
         )
     ),
   async execute(interaction) {
-    // TODO: To be continued...
+    const c = interaction.options.getString("console");
+    const g = interaction.options.getString("game");
+
+    const game = await fetchGameInformation(
+      c,
+      g,
+      interaction.client.retroAchievements
+    );
+
+    const message = new EmbedBuilder()
+      .setColor("#FFFF00")
+      .setImage(`https://media.retroachievements.org${game.ImageIngame}`)
+      .setAuthor({
+        name: game.GameTitle,
+        iconURL: `https://media.retroachievements.org${game.GameIcon}`,
+        url: `https://retroachievements.org/game/${game.ID}`,
+      })
+      .addFields(
+        {
+          name: "Genre",
+          value: `${game.Genre}`,
+          inline: true,
+        },
+        {
+          name: "Console",
+          value: `${game.ConsoleName}`,
+          inline: true,
+        },
+        {
+          name: "Released",
+          value: `${game.Released}`,
+          inline: true,
+        }
+      )
+      .setThumbnail(`https://media.retroachievements.org${game.ImageBoxArt}`)
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [message] });
   },
   async autocomplete(interaction) {
     let options;
