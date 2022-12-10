@@ -7,51 +7,12 @@
 
 "use strict";
 
-const axios = require("axios");
-
-// TODO: Remove this and use a database instead (and maybe a cache).
-const { RA } = require("../../private/configuration/application.json");
-
 const { SlashCommandBuilder } = require("discord.js");
 
-async function fetchGame(c) {
-  const arr = [];
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
-
-  if (!c) {
-    return arr;
-  }
-
-  const cUrl = `https://ra.hfc-essentials.com/console_id.php?${usr}&${key}&mode=json`;
-  const cResp = await axios.get(cUrl);
-  const cData = cResp.data.console[0];
-
-  const index = cData.findIndex((item) => item.Name === c);
-  const id = `console=${cResp.data.console[0][index].ID}`;
-
-  const gUrl = `https://ra.hfc-essentials.com/game_list.php?${usr}&${key}&${id}&mode=json`;
-  const gResp = await axios.get(gUrl);
-  const gData = gResp.data.game[0];
-
-  gData.forEach((item) => arr.push(item.Title));
-
-  return arr;
-}
-
-async function fetchConsole() {
-  const arr = [];
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
-  const url = `https://ra.hfc-essentials.com/console_id.php?${usr}&${key}&mode=json`;
-
-  const resp = await axios.get(url);
-  const data = resp.data.console[0];
-
-  data.forEach((item) => arr.push(item.Name));
-
-  return arr;
-}
+const {
+  getGameOptions,
+  getConsoleOptions,
+} = require("../helpers/retroAchievements");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -84,9 +45,12 @@ module.exports = {
     const focused = interaction.options.getFocused(true);
 
     if (focused.name === "console") {
-      options = await fetchConsole();
+      options = getConsoleOptions(interaction.client.retroAchievements);
     } else if (focused.name === "game") {
-      options = await fetchGame(interaction.options.getString("console"));
+      options = getGameOptions(
+        interaction.client.retroAchievements,
+        interaction.options.getString("console")
+      );
     }
 
     const filtered = options.filter((option) =>
