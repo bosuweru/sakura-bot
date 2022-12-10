@@ -9,6 +9,9 @@
 
 const axios = require("axios");
 
+const { Log } = require("../utils/winston");
+const log = new Log();
+
 const { RA } = require("../../private/configuration/application.json");
 
 function fetchGameData(collection) {
@@ -29,6 +32,8 @@ function fetchGameData(collection) {
 
       // TODO: This is just "good enough" but could be better.
       collection.set(name, data);
+
+      log.write("info", `Initialized ${name} game data (RetroAchievements).`);
     }, timeout);
 
     timeout = timeout + 10000;
@@ -44,6 +49,27 @@ async function fetchConsoleData(collection) {
   const data = resp.data.console[0];
 
   collection.set("console", data);
+}
+
+async function fetchGameInformation(c, g, collection) {
+  const gameList = collection.get(c);
+
+  let id;
+
+  gameList.forEach((item) => {
+    if (g === item.Title) {
+      id = item.ID;
+    }
+  });
+
+  const key = `key=${RA.API}`;
+  const usr = `user=${RA.USR}`;
+  const url = `https://ra.hfc-essentials.com/game_info.php?${usr}&${key}+&game=${id}&mode=json`;
+
+  const resp = await axios.get(url);
+  const data = resp.data;
+
+  return data;
 }
 
 function getGameOptions(collection, platform) {
@@ -69,4 +95,5 @@ module.exports = {
   fetchConsoleData,
   getGameOptions,
   getConsoleOptions,
+  fetchGameInformation,
 };
