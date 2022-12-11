@@ -1,38 +1,32 @@
 /**
- * @file Initializes the 'interactionCreate' event.
+ * @file Discord.JS 'interactionCreate' event.
  * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
  * @license AGPL-3.0
- * @version 0.1.0
+ * @version 0.4.0
  */
 
 "use strict";
 
-const { Log } = require("../utils/winston");
-const log = new Log();
-
 const { Events } = require("discord.js");
+const { logger } = require("../utilities/winston");
 
 module.exports = {
   name: Events.InteractionCreate,
   once: false,
   async execute(interaction) {
-    if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
-      return;
+    try {
+      if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
+        return;
 
-    const command = interaction.client.commands.get(interaction.commandName);
+      const command = interaction.client.commands.get(interaction.commandName);
 
-    if (interaction.isChatInputCommand()) {
-      try {
-        await command.execute(interaction);
-      } catch (error) {
-        log.write("error", error);
-      }
-    } else if (interaction.isAutocomplete()) {
-      try {
+      if (interaction.isAutocomplete()) {
         await command.autocomplete(interaction);
-      } catch (error) {
-        console.log(error);
+      } else {
+        await command.execute(interaction);
       }
+    } catch (error) {
+      logger.error(error.stack);
     }
   },
 };
