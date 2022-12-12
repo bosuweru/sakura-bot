@@ -10,10 +10,14 @@
 const { Events } = require("discord.js");
 const { logger } = require("../utilities/winston");
 
+const { cacheConsoleData } = require("../helpers/retroAchievements");
+
 module.exports = {
   name: Events.ClientReady,
   once: true,
   execute(client) {
+    cacheConsoleData(client.consoleData);
+
     logger.info(`Client (${client.user.tag}) is ready.`);
   },
 };
