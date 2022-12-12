@@ -1,109 +1,57 @@
 /**
- * @file Initializes the 'retroAchievements' command.
+ * @file Executes the 'retroAchievements' slash command.
  * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
  * @license AGPL-3.0
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 "use strict";
 
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-
-const {
-  getGameOptions,
-  getConsoleOptions,
-  fetchGameInformation,
-} = require("../helpers/retroAchievements");
+const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("retroachievements")
-    .setDescription("Retrieves RetroAchievements information.")
+    .setName("achievements")
+    .setDescription("Executes RetroAchievements interactions.")
     .addSubcommand((subcommand) =>
       subcommand
         .setName("search")
-        .setDescription("Retrieves RetroAchievements game information.")
+        .setDescription("Retrieves game information.")
         .addStringOption((option) =>
           option
-            .setName("console")
+            .setName("platform")
             .setRequired(true)
-            .setDescription("The pre-defined console value.")
-            .setAutocomplete(true)
-        )
-        .addStringOption((option) =>
-          option
-            .setName("game")
-            .setRequired(true)
-            .setDescription("The pre-defined game title value.")
+            .setDescription("The platform name of the game.")
             .setAutocomplete(true)
         )
     ),
   async execute(interaction) {
-    const c = interaction.options.getString("console");
-    const g = interaction.options.getString("game");
-
-    const game = await fetchGameInformation(
-      c,
-      g,
-      interaction.client.retroAchievements
-    );
-
-    const message = new EmbedBuilder()
-      .setColor("#FFFF00")
-      .setImage(`https://media.retroachievements.org${game.ImageIngame}`)
-      .setAuthor({
-        name: game.GameTitle,
-        iconURL: `https://media.retroachievements.org${game.GameIcon}`,
-        url: `https://retroachievements.org/game/${game.ID}`,
-      })
-      .addFields(
-        {
-          name: "Genre",
-          value: `${game.Genre}`,
-          inline: true,
-        },
-        {
-          name: "Console",
-          value: `${game.ConsoleName}`,
-          inline: true,
-        },
-        {
-          name: "Released",
-          value: `${game.Released}`,
-          inline: true,
-        }
-      )
-      .setThumbnail(`https://media.retroachievements.org${game.ImageBoxArt}`)
-      .setTimestamp();
-
-    await interaction.reply({ embeds: [message] });
+    await interaction.reply({
+      content: "This interaction is currently under development.",
+      ephemeral: true,
+    });
   },
   async autocomplete(interaction) {
     let options;
+    let reduced;
+
     const focused = interaction.options.getFocused(true);
 
-    if (focused.name === "console") {
-      options = getConsoleOptions(interaction.client.retroAchievements);
-    } else if (focused.name === "game") {
-      options = getGameOptions(
-        interaction.client.retroAchievements,
-        interaction.options.getString("console")
-      );
+    if (focused.name === "platform") {
+      options = Array.from(interaction.client.consoleData.keys());
     }
 
     const filtered = options.filter((option) =>
       option.startsWith(focused.value)
     );
 
-    let selection;
-    if (filtered.length > 5) {
-      selection = filtered.slice(0, 5);
+    if (filtered.length > 25) {
+      reduced = filtered.slice(0, 25);
     } else {
-      selection = filtered;
+      reduced = filtered;
     }
 
-    await interaction.respond(
-      selection.map((option) => ({ name: option, value: option }))
-    );
+    // eslint-disable-next-line prettier/prettier
+    await interaction.respond(reduced.map((option) => ({ name: option, value: option })));
   },
 };
