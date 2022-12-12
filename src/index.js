@@ -29,6 +29,8 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection();
+client.gameData = new Collection();
+client.consoleData = new Collection();
 
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
