@@ -1,99 +1,49 @@
 /**
- * @file Initializes the retroAchievements helper.
+ * @file Assists with RetroAchievements data management.
  * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
  * @license AGPL-3.0
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 "use strict";
 
+const fs = require("node:fs");
+const path = require("node:path");
+
 const axios = require("axios");
 
-const { Log } = require("../utils/winston");
-const log = new Log();
+const key = process.env.RETROACHIEVEMENTS_KEY;
+const mode = "json";
+const user = process.env.RETROACHIEVEMENTS_USER;
 
-const { RA } = require("../../private/configuration/application.json");
+async function fetchConsoleData() {
+  const url = `https://ra.hfc-essentials.com/console_id.php?user=${user}&key=${key}&mode=${mode}`;
+  const res = await axios.get(url);
 
-function fetchGameData(collection) {
-  const obj = collection.get("console");
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
+  return res.data;
+}
 
-  let timeout = 10000;
+async function writeConsoleData() {
+  // eslint-disable-next-line prettier/prettier
+  const file = path.join(__dirname, "..", "..", "private", "data", "ConsoleData", "console.json");
+  const data = await fetchConsoleData();
 
-  obj.forEach((item) => {
-    setTimeout(async () => {
-      const id = item.ID;
-      const name = item.Name;
+  const result = JSON.stringify(data);
 
-      const addr = `https://ra.hfc-essentials.com/game_list.php?${usr}&${key}&console=${id}&mode=json`;
-      const resp = await axios.get(addr);
-      const data = resp.data.game[0];
+  fs.writeFileSync(file, result);
+}
 
-      // TODO: This is just "good enough" but could be better.
-      collection.set(name, data);
+function cacheConsoleData(collection) {
+  // eslint-disable-next-line prettier/prettier
+  const file = path.join(__dirname, "..", "..", "private", "data", "ConsoleData", "console.json");
+  const data = fs.readFileSync(file);
 
-      log.write("info", `Initialized ${name} game data (RetroAchievements).`);
-    }, timeout);
+  const parsed = JSON.parse(data);
+  const result = parsed.console[0];
 
-    timeout = timeout + 10000;
+  result.forEach((item) => {
+    collection.set(item.Name, item.ID);
   });
 }
 
-async function fetchConsoleData(collection) {
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
-  const url = `https://ra.hfc-essentials.com/console_id.php?${usr}&${key}&mode=json`;
-
-  const resp = await axios.get(url);
-  const data = resp.data.console[0];
-
-  collection.set("console", data);
-}
-
-async function fetchGameInformation(c, g, collection) {
-  const gameList = collection.get(c);
-
-  let id;
-
-  gameList.forEach((item) => {
-    if (g === item.Title) {
-      id = item.ID;
-    }
-  });
-
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
-  const url = `https://ra.hfc-essentials.com/game_info.php?${usr}&${key}+&game=${id}&mode=json`;
-
-  const resp = await axios.get(url);
-  const data = resp.data;
-
-  return data;
-}
-
-function getGameOptions(collection, platform) {
-  const data = collection.get(platform);
-  const options = [];
-
-  data.forEach((item) => options.push(item.Title));
-
-  return options;
-}
-
-function getConsoleOptions(collection) {
-  const data = collection.get("console");
-  const options = [];
-
-  data.forEach((item) => options.push(item.Name));
-
-  return options;
-}
-
-module.exports = {
-  fetchGameData,
-  fetchConsoleData,
-  getGameOptions,
-  getConsoleOptions,
-  fetchGameInformation,
-};
+module.exports = { cacheConsoleData, writeConsoleData };
