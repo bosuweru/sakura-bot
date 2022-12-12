@@ -9,6 +9,8 @@
 
 const { SlashCommandBuilder } = require("discord.js");
 
+const { getGameList, getConsoleList } = require("../helpers/retroAchievements");
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("achievements")
@@ -21,7 +23,14 @@ module.exports = {
           option
             .setName("platform")
             .setRequired(true)
-            .setDescription("The platform name of the game.")
+            .setDescription("The platform name.")
+            .setAutocomplete(true)
+        )
+        .addStringOption((option) =>
+          option
+            .setName("title")
+            .setRequired(true)
+            .setDescription("The title name.")
             .setAutocomplete(true)
         )
     ),
@@ -38,7 +47,10 @@ module.exports = {
     const focused = interaction.options.getFocused(true);
 
     if (focused.name === "platform") {
-      options = Array.from(interaction.client.consoleData.keys());
+      options = getConsoleList(interaction.client.consoleData);
+    } else if (focused.name === "title") {
+      // eslint-disable-next-line prettier/prettier
+      options = getGameList(interaction.options.getString("platform"), interaction.client.gameData);
     }
 
     const filtered = options.filter((option) =>
