@@ -10,6 +10,7 @@
 const { Events } = require("discord.js");
 const { logger } = require("../utilities/winston");
 
+const { cacheGameData } = require("../helpers/retroAchievements");
 const { cacheConsoleData } = require("../helpers/retroAchievements");
 
 module.exports = {
@@ -17,6 +18,7 @@ module.exports = {
   once: true,
   execute(client) {
     cacheConsoleData(client.consoleData);
+    cacheGameData(client.gameData);
 
     logger.info(`Client (${client.user.tag}) is ready.`);
   },
