@@ -31,7 +31,7 @@
     "axios": "^1.2.1",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
-    "dotenv-expand": "^9.0.0",
+    "dotenv-expand": "^10.0.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
