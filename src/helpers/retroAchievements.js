@@ -1,99 +1,154 @@
 /**
- * @file Initializes the retroAchievements helper.
+ * @file Assists with RetroAchievements data management.
  * @author bosuweru <116328571+bosuweru@users.noreply.github.com>
  * @license AGPL-3.0
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 "use strict";
 
+const fs = require("node:fs");
+const path = require("node:path");
+
 const axios = require("axios");
 
-const { Log } = require("../utils/winston");
-const log = new Log();
+const key = process.env.RETROACHIEVEMENTS_KEY;
+const mode = "json";
+const user = process.env.RETROACHIEVEMENTS_USER;
 
-const { RA } = require("../../private/configuration/application.json");
+function getGameId(collection, platform, title) {
+  const gameData = collection.get(platform);
 
-function fetchGameData(collection) {
-  const obj = collection.get("console");
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
+  let gameId;
 
-  let timeout = 10000;
-
-  obj.forEach((item) => {
-    setTimeout(async () => {
-      const id = item.ID;
-      const name = item.Name;
-
-      const addr = `https://ra.hfc-essentials.com/game_list.php?${usr}&${key}&console=${id}&mode=json`;
-      const resp = await axios.get(addr);
-      const data = resp.data.game[0];
-
-      // TODO: This is just "good enough" but could be better.
-      collection.set(name, data);
-
-      log.write("info", `Initialized ${name} game data (RetroAchievements).`);
-    }, timeout);
-
-    timeout = timeout + 10000;
-  });
-}
-
-async function fetchConsoleData(collection) {
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
-  const url = `https://ra.hfc-essentials.com/console_id.php?${usr}&${key}&mode=json`;
-
-  const resp = await axios.get(url);
-  const data = resp.data.console[0];
-
-  collection.set("console", data);
-}
-
-async function fetchGameInformation(c, g, collection) {
-  const gameList = collection.get(c);
-
-  let id;
-
-  gameList.forEach((item) => {
-    if (g === item.Title) {
-      id = item.ID;
+  gameData.forEach((item) => {
+    if (item.Title === title) {
+      gameId = item.ID;
     }
   });
 
-  const key = `key=${RA.API}`;
-  const usr = `user=${RA.USR}`;
-  const url = `https://ra.hfc-essentials.com/game_info.php?${usr}&${key}+&game=${id}&mode=json`;
-
-  const resp = await axios.get(url);
-  const data = resp.data;
-
-  return data;
+  return gameId;
 }
 
-function getGameOptions(collection, platform) {
-  const data = collection.get(platform);
-  const options = [];
+function getGameList(platform, collection) {
+  const gameList = [];
+  const gameData = collection.get(platform);
 
-  data.forEach((item) => options.push(item.Title));
+  gameData.forEach((item) => {
+    gameList.push(item.Title);
+  });
 
-  return options;
+  return gameList;
 }
 
-function getConsoleOptions(collection) {
-  const data = collection.get("console");
-  const options = [];
+function getConsoleId(collection, platform) {
+  return collection.get(platform);
+}
 
-  data.forEach((item) => options.push(item.Name));
+function getImageIcon(collection, platform, title) {
+  const gameData = collection.get(platform);
 
-  return options;
+  let imageIcon;
+
+  gameData.forEach((item) => {
+    if (item.Title === title) {
+      imageIcon = item.ImageIcon;
+    }
+  });
+
+  return imageIcon;
+}
+
+function getConsoleList(collection) {
+  return Array.from(collection.keys());
+}
+
+async function fetchGameData(id) {
+  const url = `https://ra.hfc-essentials.com/game_list.php?user=${user}&key=${key}&console=${id}&mode=${mode}`;
+  const res = await axios.get(url);
+
+  return res.data;
+}
+
+async function fetchConsoleData() {
+  const url = `https://ra.hfc-essentials.com/console_id.php?user=${user}&key=${key}&mode=${mode}`;
+  const res = await axios.get(url);
+
+  return res.data;
+}
+
+async function writeGameData(id, platform) {
+  let fileName;
+
+  switch (platform) {
+    case "PC-8000/8800":
+      fileName = "pc-8000";
+      break;
+    default:
+      fileName = platform.toLowerCase();
+      break;
+  }
+
+  // eslint-disable-next-line prettier/prettier
+  const file = path.join(__dirname, "..", "..", "private", "data", "GameData", `${fileName}.json`);
+  const data = await fetchGameData(id);
+
+  const result = JSON.stringify(data);
+
+  fs.writeFileSync(file, result);
+}
+
+async function writeConsoleData() {
+  // eslint-disable-next-line prettier/prettier
+  const file = path.join(__dirname, "..", "..", "private", "data", "ConsoleData", "console.json");
+  const data = await fetchConsoleData();
+
+  const result = JSON.stringify(data);
+
+  fs.writeFileSync(file, result);
+}
+
+function cacheGameData(collection) {
+  // eslint-disable-next-line prettier/prettier
+  const gameFolder = path.join(__dirname, "..", "..", "private", "data", "GameData");
+  const gameFiles = fs
+    .readdirSync(gameFolder)
+    .filter((file) => file.endsWith(".json"));
+
+  for (const gameFile of gameFiles) {
+    const file = path.join(gameFolder, gameFile);
+    const data = fs.readFileSync(file);
+
+    const parsed = JSON.parse(data);
+    const result = parsed.game[0];
+
+    if (result[0]) collection.set(result[0].ConsoleName, result);
+  }
+}
+
+function cacheConsoleData(collection) {
+  // eslint-disable-next-line prettier/prettier
+  const file = path.join(__dirname, "..", "..", "private", "data", "ConsoleData", "console.json");
+  const data = fs.readFileSync(file);
+
+  const parsed = JSON.parse(data);
+  const result = parsed.console[0];
+
+  result.forEach((item) => {
+    collection.set(item.Name, item.ID);
+  });
 }
 
 module.exports = {
+  getGameId,
+  getGameList,
+  getConsoleId,
+  getImageIcon,
+  cacheGameData,
   fetchGameData,
+  writeGameData,
+  getConsoleList,
+  cacheConsoleData,
   fetchConsoleData,
-  getGameOptions,
-  getConsoleOptions,
-  fetchGameInformation,
+  writeConsoleData,
 };
