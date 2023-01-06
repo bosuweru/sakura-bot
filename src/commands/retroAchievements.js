@@ -7,9 +7,25 @@
 
 "use strict";
 
-const { SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
-const { getGameList, getConsoleList } = require("../helpers/retroAchievements");
+const {
+  getGameId,
+  getGameList,
+  getImageIcon,
+  getConsoleList,
+} = require("../helpers/retroAchievements");
+
+function messageEmbed(ID, Title, ImageIcon) {
+  return new EmbedBuilder()
+    .setColor("#FFFF00")
+    .setAuthor({
+      url: `https://retroachievements.org/game/${ID}`,
+      name: `${Title}`,
+    })
+    .setThumbnail(`https://media.retroachievements.org${ImageIcon}`)
+    .setTimestamp();
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -35,10 +51,15 @@ module.exports = {
         )
     ),
   async execute(interaction) {
-    await interaction.reply({
-      content: "This interaction is currently under development.",
-      ephemeral: true,
-    });
+    const title = interaction.options.getString("title");
+    const platform = interaction.options.getString("platform");
+
+    const id = getGameId(interaction.client.gameData, platform, title);
+    const icon = getImageIcon(interaction.client.gameData, platform, title);
+
+    const message = messageEmbed(id, title, icon);
+
+    await interaction.reply({ embeds: [message] });
   },
   async autocomplete(interaction) {
     let options;

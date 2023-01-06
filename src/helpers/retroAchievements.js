@@ -16,6 +16,20 @@ const key = process.env.RETROACHIEVEMENTS_KEY;
 const mode = "json";
 const user = process.env.RETROACHIEVEMENTS_USER;
 
+function getGameId(collection, platform, title) {
+  const gameData = collection.get(platform);
+
+  let gameId;
+
+  gameData.forEach((item) => {
+    if (item.Title === title) {
+      gameId = item.ID;
+    }
+  });
+
+  return gameId;
+}
+
 function getGameList(platform, collection) {
   const gameList = [];
   const gameData = collection.get(platform);
@@ -25,6 +39,24 @@ function getGameList(platform, collection) {
   });
 
   return gameList;
+}
+
+function getConsoleId(collection, platform) {
+  return collection.get(platform);
+}
+
+function getImageIcon(collection, platform, title) {
+  const gameData = collection.get(platform);
+
+  let imageIcon;
+
+  gameData.forEach((item) => {
+    if (item.Title === title) {
+      imageIcon = item.ImageIcon;
+    }
+  });
+
+  return imageIcon;
 }
 
 function getConsoleList(collection) {
@@ -108,7 +140,10 @@ function cacheConsoleData(collection) {
 }
 
 module.exports = {
+  getGameId,
   getGameList,
+  getConsoleId,
+  getImageIcon,
   cacheGameData,
   fetchGameData,
   writeGameData,
